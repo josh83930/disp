@@ -1,0 +1,72 @@
+############################################################################
+#                                                                          #
+# Copyright (c) 1993-1994 CASPUR Consortium                                # 
+#                         c/o Universita' "La Sapienza", Rome, Italy       #
+# All rights reserved.                                                     #
+#                                                                          #
+# Permission is hereby granted, without written agreement and without      #
+# license or royalty fees, to use, copy, modify, and distribute this       #
+# software and its documentation for any purpose, provided that the        #
+# above copyright notice and the following two paragraphs and the team     #
+# reference appear in all copies of this software.                         #
+#                                                                          #
+# IN NO EVENT SHALL THE CASPUR CONSORTIUM BE LIABLE TO ANY PARTY FOR       #
+# DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING  #
+# OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE       #
+# CASPUR CONSORTIUM HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.    #
+#                                                                          #
+# THE CASPUR CONSORTIUM SPECIFICALLY DISCLAIMS ANY WARRANTIES,             #
+# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY #
+# AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER   #
+# IS ON AN "AS IS" BASIS, AND THE CASPUR CONSORTIUM HAS NO OBLIGATION TO   #
+# PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.   #
+#                                                                          #
+#       +----------------------------------------------------------+       #
+#       |   The ControlHost Team: Ruten Gurin, Andrei Maslennikov  |       #
+#       |   Contact e-mail      : ControlHost@caspur.it            |       #
+#       +----------------------------------------------------------+       #
+#                                                                          #
+############################################################################
+
+# $Id: pat_Makefile.AIX,v 1.5 1995/05/10 08:52:53 ruten Exp $
+
+# Make file for AIX
+# pattern for client creation makefile
+# Note that options defined in CFLAGS,FFLAGS,SOCK 
+# are VERY important. Never miss them in your Makefile 
+
+BASE = /afs/caspur.it/project/ControlHost
+
+CFLAGS = -D_BSD=43 -DAIX -I$(BASE)/include
+FFLAGS = -qextname
+
+SOCK = -lbsd -L$(BASE)/lib -lconthost
+
+FORTLIB = -lxlf
+
+TCLINCLUDE = -I/usr/local/include
+
+TCLEXTLIB = -L/usr/local/lib -ltclx -ltkx
+
+TCLLIB	= $(TCLEXTLIB) -L/usr/local/lib -ltcl -ltk -lXpm -lm -lX11
+
+C_CLIENT = pat_c_bla_bla
+F_CLIENT = pat_f_bla_bla
+TCL_CLIENT = pat_tcl_user
+
+all: $(C_CLIENT) $(F_CLIENT) $(TCL_CLIENT)
+
+$(C_CLIENT): $(C_CLIENT).o
+	$(CC) -o $(C_CLIENT) $(C_CLIENT).o $(SOCK)
+	strip $(C_CLIENT)
+
+$(F_CLIENT): $(F_CLIENT).o
+	$(CC) -o $(F_CLIENT) $(F_CLIENT).o $(SOCK) $(FORTLIB)
+	strip $(F_CLIENT)
+
+$(TCL_CLIENT).o: $(TCL_CLIENT).c
+	$(CC) $(CFLAGS) $(TCLINCLUDE) -c $(TCL_CLIENT).c
+
+$(TCL_CLIENT): $(TCL_CLIENT).o
+	$(CC) -o $(TCL_CLIENT) $(BASE)/lib/tcldisp.o $(BASE)/lib/tclsupp.o $(TCL_CLIENT).o $(SOCK) $(TCLLIB)
+	strip $(TCL_CLIENT)

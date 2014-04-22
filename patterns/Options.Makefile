@@ -1,0 +1,128 @@
+############################################################################
+#                                                                          #
+# Copyright (c) 1993-1994 CASPUR Consortium                                #
+#                         c/o Universita' "La Sapienza", Rome, Italy       #
+# All rights reserved.                                                     #
+#                                                                          #
+# Permission is hereby granted, without written agreement and without      #
+# license or royalty fees, to use, copy, modify, and distribute this       #
+# software and its documentation for any purpose, provided that the        #
+# above copyright notice and the following two paragraphs and the team     #
+# reference appear in all copies of this software.                         #
+#                                                                          #
+# IN NO EVENT SHALL THE CASPUR CONSORTIUM BE LIABLE TO ANY PARTY FOR       #
+# DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING  #
+# OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE       #
+# CASPUR CONSORTIUM HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.    #
+#                                                                          #
+# THE CASPUR CONSORTIUM SPECIFICALLY DISCLAIMS ANY WARRANTIES,             #
+# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY #
+# AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER   #
+# IS ON AN "AS IS" BASIS, AND THE CASPUR CONSORTIUM HAS NO OBLIGATION TO   #
+# PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.   #
+#                                                                          #
+#       +----------------------------------------------------------+       #
+#       |   The ControlHost Team: Ruten Gurin, Andrei Maslennikov  |       #
+#       |   Contact e-mail      : ControlHost@caspur.it            |       #
+#       +----------------------------------------------------------+       #
+#                                                                          #
+############################################################################
+
+# $Id: Options.Makefile,v 1.2 1996/01/31 12:10:24 ruten Exp $
+
+
+SYS := $(shell uname | tr "-" "_" )
+
+.PHONY: clean
+
+ifeq ($(VPATH),)
+  VPATH = .
+endif
+
+CFLAGS   = $(CFLAGS_PROJECT)   $(CFLAGS_COMMON)
+CXXFLAGS = $(CXXFLAGS_PROJECT) $(CXXFLAGS_COMMON)
+LDFLAGS  = $(LDFLAGS_PROJECT)  $(LDFLAGS_COMMON)
+LDXXFLAGS  = $(LDXXFLAGS_PROJECT)  $(LDXXFLAGS_COMMON)
+
+CFLAGS_COMMON   := -O -D$(SYS) -I$(VPATH) -g
+CXXFLAGS_COMMON := $(CFLAGS_COMMON)
+LDFLAGS_COMMON  :=
+LDXXFLAGS_COMMON:= 
+
+CFLAGS_PROJECT   := 
+CXXFLAGS_PROJECT :=
+LDFLAGS_PROJECT  :=
+LDXXFLAGS_PROJECT:=
+
+ifeq ($(SYS),SunOS)
+USE_LOCAL_COMPILER = no
+#CC := CC
+#CXX := CC
+endif
+
+ifeq ($(SYS),Linux)
+USE_LOCAL_COMPILER = no
+endif
+
+# use local compiler by default 
+ifeq ($(USE_LOCAL_COMPILER),)
+USE_LOCAL_COMPILER = yes
+endif
+
+ifneq ($(USE_LOCAL_COMPILER),yes)
+  CC  := gcc
+  CXX := g++
+endif
+
+ifeq ($(SYS),HP_UX)
+  ifeq ($(USE_LOCAL_COMPILER),yes)
+    CFLAGS_COMMON := -Aa -D_HPUX_SOURCE $(CFLAGS_COMMON)
+  endif
+  LDFLAGS_COMMON := -lBSD $(LDFLAGS_COMMON)
+  LDXXFLAGS_COMMON := -lBSD $(LDXXFLAGS_COMMON)
+endif
+
+ifeq ($(SYS),AIX) 
+  CFLAGS_COMMON := -D_BSD=43 $(CFLAGS_COMMON)
+  CXXFLAGS_COMMON := -D_BSD=43 $(CXXFLAGS_COMMON)
+  LDFLAGS_COMMON := -lbsd $(LDFLAGS_COMMON)
+  LDXXFLAGS_COMMON := -lbsd $(LDXXFLAGS_COMMON)
+  ifeq ($(USE_LOCAL_COMPILER),yes)
+    CC := cc
+    CXX := xlC 
+    CXXFLAGS_COMMON := -Q $(CXXFLAGS_COMMON)
+    LDXXFLAGS_COMMON := -lCns $(LDXXFLAGS_COMMON)
+  endif
+endif
+
+ifeq ($(SYS),IRIX)
+  CFLAGS_COMMON := -D_BSD_COMPAT $(CFLAGS_COMMON)
+  ifeq ($(USE_LOCAL_COMPILER),yes)
+    CC := cc
+    CXX := CC
+    CFLAGS_COMMON := -fullwarn $(CFLAGS_COMMON)
+  endif
+  CXXFLAGS_COMMON := $(CFLAGS_COMMON)
+endif
+
+ifeq ($(SYS),OSF1)
+  ifeq ($(USE_LOCAL_COMPILER),yes)
+    CC := cc
+    CXX := cxx
+    CFLAGS_COMMON := -std $(CFLAGS_COMMON)
+  endif
+endif
+
+ifeq ($(SYS),SunOS)
+  LDFLAGS_COMMON := -lsocket -lnsl -lposix4  $(LDFLAGS_COMMON)
+  LDXXFLAGS_COMMON := -lsocket -lnsl -lposix4 $(LDFLAGS_COMMON)
+endif
+
+ifeq ($(CC),gcc)
+  CFLAGS_COMMON := -Wall $(CFLAGS_COMMON)
+endif
+
+ifeq ($(CXX),g++)
+#  CXXFLAGS_COMMON := -Wall -DBool_Defined $(CXXFLAGS_COMMON)
+  CXXFLAGS_COMMON := $(CXXFLAGS_COMMON)
+endif

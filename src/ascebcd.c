@@ -1,0 +1,149 @@
+/*
+############################################################################
+#                                                                          #
+# Copyright (c) 1993-1994 CASPUR Consortium                                # 
+#                         c/o Universita' "La Sapienza", Rome, Italy       #
+# All rights reserved.                                                     #
+#                                                                          #
+# Permission is hereby granted, without written agreement and without      #
+# license or royalty fees, to use, copy, modify, and distribute this       #
+# software and its documentation for any purpose, provided that the        #
+# above copyright notice and the following two paragraphs and the team     #
+# reference appear in all copies of this software.                         #
+#                                                                          #
+# IN NO EVENT SHALL THE CASPUR CONSORTIUM BE LIABLE TO ANY PARTY FOR       #
+# DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING  #
+# OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE       #
+# CASPUR CONSORTIUM HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.    #
+#                                                                          #
+# THE CASPUR CONSORTIUM SPECIFICALLY DISCLAIMS ANY WARRANTIES,             #
+# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY #
+# AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER   #
+# IS ON AN "AS IS" BASIS, AND THE CASPUR CONSORTIUM HAS NO OBLIGATION TO   #
+# PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.   #
+#                                                                          #
+#       +----------------------------------------------------------+       #
+#       |   The ControlHost Team: Ruten Gurin, Andrei Maslennikov  |       #
+#       |   Contact e-mail      : ControlHost@caspur.it            |       #
+#       +----------------------------------------------------------+       #
+#                                                                          #
+############################################################################
+*/
+
+
+/*
+ $Id: ascebcd.c,v 1.4 1995/03/21 14:33:41 ruten Exp $
+*/
+
+/* EBSDIC <-> ascii conversions */
+/* Conversion table is obtained from Nico Colino, CERN */
+
+#include "ascebcd.h"
+ 
+static char toascii[256] = {
+      0x00,0x01,0x02,0x03,0x23,0x09,0x23,0x7F   /* 07          */
+      ,0x23,0x23,0x23,0x0B,0x0C,0x0D,0x0E,0x0F  /* 0F          */
+      ,0x10,0x11,0x12,0x13,0x23,0x0A,0x08,0x23  /* 17          */
+      ,0x18,0x19,0x23,0x23,0x1C,0x1D,0x1E,0x1F  /* 1F          */
+      ,0x23,0x23,0x23,0x23,0x23,0x23,0x17,0x1B  /* 27          */
+/*    ,0x23,0x23,0x23,0x23,0x23,0x0A,0x17,0x1B     Change 25 0A->23 */
+      ,0x23,0x23,0x23,0x23,0x23,0x05,0x06,0x07  /* 2F          */
+      ,0x23,0x23,0x16,0x23,0x23,0x23,0x23,0x04  /* 37          */
+      ,0x23,0x23,0x23,0x23,0x14,0x15,0x23,0x1A  /* 3F          */
+      ,0x20,0x23,0x23,0x23,0x23,0x23,0x23,0x23  /* 47          */
+      ,0x23,0x23,0x23,0x2E,0x3C,0x28,0x2B,0x7C  /* 4F          */
+      ,0x26,0x23,0x23,0x23,0x23,0x23,0x23,0x23  /* 57          */
+/*    ,0x23,0x23,0x21,0x24,0x2A,0x29,0x3B,0x5E     5F          */
+      ,0x23,0x23,0x21,0x24,0x2A,0x29,0x3B,0x7E  /* Change 5F 7E->5E */
+ 
+      ,0x2D,0x2F,0x23,0x23,0x23,0x23,0x23,0x23  /* 67           */
+/*    ,0x23,0x23,0x23,0x2C,0x25,0x5F,0x3E,0x3F   6F             */
+      ,0x23,0x23,0x5E,0x2C,0x25,0x5F,0x3E,0x3F  /* Change 6A 5E->23 */
+      ,0x23,0x23,0x23,0x23,0x23,0x23,0x23,0x23  /* 77           */
+      ,0x23,0x60,0x3A,0x23,0x40,0x27,0x3D,0x22  /* 7F           */
+      ,0x23,0x61,0x62,0x63,0x64,0x65,0x66,0x67  /* 87           */
+      ,0x68,0x69,0x23,0x23,0x23,0x23,0x23,0x23  /* 8F           */
+/*    ,0x68,0x69,0x23,0x7B,0x23,0x23,0x23,0x23     Change 8B 7B->23 */
+      ,0x23,0x6A,0x6B,0x6C,0x6D,0x6E,0x6F,0x70  /* 97           */
+      ,0x71,0x72,0x23,0x23,0x23,0x23,0x23,0x23  /* 9F           */
+/*    ,0x71,0x72,0x23,0x7D,0x23,0x23,0x23,0x23     Change 9B 7D->23*/
+/*    ,0x23,0x7E,0x73,0x74,0x75,0x76,0x77,0x78     A7            */
+      ,0x23,0x23,0x73,0x74,0x75,0x76,0x77,0x78  /* Change A1 23->7E */
+      ,0x79,0x7A,0x23,0x23,0x23,0x5B,0x23,0x23  /* AF             */
+      ,0x23,0x23,0x23,0x23,0x23,0x23,0x23,0x23  /* B7             */
+      ,0x23,0x23,0x23,0x23,0x23,0x5D,0x23,0x23  /* BF             */
+      ,0x7B,0x41,0x42,0x43,0x44,0x45,0x46,0x47  /* C7             */
+      ,0x48,0x49,0x23,0x23,0x23,0x23,0x23,0x23  /* CF             */
+      ,0x7D,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,0x50  /* D7             */
+      ,0x51,0x52,0x23,0x23,0x23,0x23,0x23,0x23  /* DF             */
+      ,0x5C,0x23,0x53,0x54,0x55,0x56,0x57,0x58  /* E7             */
+      ,0x59,0x5A,0x23,0x23,0x23,0x23,0x23,0x23  /* EF             */
+      ,0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37  /* F7             */
+      ,0x38,0x39,0x23,0x23,0x23,0x23,0x23,0x23  /* FF             */
+      } ;
+static char toebcdic[256];
+ 
+static int done = 0;
+ 
+static void fillcvtabs(void)
+  {
+  int i;
+  if( !done )
+    {
+    for (i=0;i<256;i++)
+      {
+/*
+if( toascii[i] != 0x23 && toebcdic[toascii[i]] )
+{
+printf("conflict %x %x %x\n",toebcdic[toascii[i]],i,toascii[i]);
+printf("%c %c\n",toebcdic[toascii[i]],i);
+}
+*/
+      toebcdic[toascii[i] & 0xff] = i;
+      }
+    done = 1;
+    }
+  }
+ 
+char c2ascii(char c)
+  {
+  if( !done ) fillcvtabs();
+  return toascii[c & 0xff];
+  }
+ 
+char c2ebcdic(char c)
+  {
+  if( !done ) fillcvtabs();
+  return toebcdic[c & 0xff];
+  }
+ 
+void str2ascii(register char *s)
+  {
+  if( !done ) fillcvtabs();
+  for(; *s; s++)
+    *s = toascii[*s & 0xff];
+  }
+ 
+void str2ebcdic(register char *s)
+  {
+  if( !done ) fillcvtabs();
+  for(; *s; s++)
+    *s = toebcdic[*s & 0xff];
+  }
+ 
+void mem2ascii(void *v, register int size)
+  {
+  register char *s = (char *) v;
+  if( !done ) fillcvtabs();
+  for(; size>0 ; s++,size--)
+    *s = toascii[*s & 0xff];
+  }
+ 
+void mem2ebcdic(void *v, register int size)
+  {
+  register char *s = (char *) v;
+  if( !done ) fillcvtabs();
+  for(; size>0 ; s++,size--)
+    *s = toebcdic[*s & 0xff];
+  }
+ 

@@ -1,0 +1,77 @@
+############################################################################
+#                                                                          #
+# Copyright (c) 1993-1994 CASPUR Consortium                                # 
+#                         c/o Universita' "La Sapienza", Rome, Italy       #
+# All rights reserved.                                                     #
+#                                                                          #
+# Permission is hereby granted, without written agreement and without      #
+# license or royalty fees, to use, copy, modify, and distribute this       #
+# software and its documentation for any purpose, provided that the        #
+# above copyright notice and the following two paragraphs and the team     #
+# reference appear in all copies of this software.                         #
+#                                                                          #
+# IN NO EVENT SHALL THE CASPUR CONSORTIUM BE LIABLE TO ANY PARTY FOR       #
+# DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING  #
+# OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE       #
+# CASPUR CONSORTIUM HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.    #
+#                                                                          #
+# THE CASPUR CONSORTIUM SPECIFICALLY DISCLAIMS ANY WARRANTIES,             #
+# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY #
+# AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER   #
+# IS ON AN "AS IS" BASIS, AND THE CASPUR CONSORTIUM HAS NO OBLIGATION TO   #
+# PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.   #
+#                                                                          #
+#       +----------------------------------------------------------+       #
+#       |   The ControlHost Team: Ruten Gurin, Andrei Maslennikov  |       #
+#       |   Contact e-mail      : ControlHost@caspur.it            |       #
+#       +----------------------------------------------------------+       #
+#                                                                          #
+############################################################################
+
+$Id: SkipModes.README,v 1.3 1995/04/24 09:59:07 gurin Exp $
+
+Data skipping modes.
+
+--------------------
+
+If the client is subscribed to some tag without the 'a' option,
+then he is ready to loose some of the data portions.
+Which data portions will be really lost is determined by the
+'data skipping mode' for the communication line.
+
+There are three possible modes - 'all','none','calc'.
+When the line is created the mode 'calc' is set on it.
+The mode may be changed at any moment via 'set_skip_mode' routine.
+
+Skipping occurs in two situations:
+	1) the dispatcher ran out of memory. In that case
+		the data is always skipped (and destroyed) independently
+		of skipping mode.
+		NB: only for data which are not subscribed with 'a' option!
+	2) the dispatcher is ready to send
+		the data portion with the given tag to the client and the client is not
+		yet ready to receive it ('send_me_always' was not used
+		and 'send_me_next' was not yet called). In that situation dispatcher
+		looks to the skipping mode. The actions are:
+
+all	- dispatcher skips that data portion.
+
+none	- dispatcher never skips the data.
+ 
+calc	- dispatcher evaluates the client capacity to recieve the data
+		(the ratio of really received data to the data which
+		could be sent in principle). The decision about skipping
+		is based on that ratio and the number of recently skipped
+		data portions.
+
+
+The impact of different skipping modes may be illustarted by an example:
+
+	suppose the data with the tag 'EVENT' are coming in bursts -
+	at the beginning of each minute ten portion arrive.
+
+	the consumer is subscribed to 'EVENT' whithout the 'a' option,
+	don't uses 'send_me_always' and is able to process one data portion
+	in 10 seconds.
+	
+***************** Unfinished ******************************

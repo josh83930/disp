@@ -1,0 +1,29 @@
+SNO+ Dispatcher
+===============
+
+Installation
+------------
+
+To install the dispatcher library::
+
+    $ git clone git@github.com:snoplus/disp.git
+    $ cd disp/src
+    $ make
+
+If you want to build RAT with dispatch support, you should add the following
+line to your ~/.bashrc file::
+
+    export DISPROOT=[path/to/disp]
+
+where `[path/to/disp]` is the path to the root directory of the disp package.
+
+Running the Dispatcher
+----------------------
+
+To run the dispatcher, simply run::
+
+    $DISPROOT/bin/dispatch
+
+To run the dispatcher as a daemon::
+
+    nohup $DISPROOT/bin/dispatch &>[path/to/logfile] &

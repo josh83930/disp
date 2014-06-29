@@ -45,7 +45,7 @@ endif
 include $(VPATH)/../patterns/Options.Makefile
 
 LIBNICK = conthost
-L = lib$(LIBNICK).a
+L = lib$(LIBNICK).so
 
 ifeq ($(SYS),Linux)
   TCLINCLUDE = -I/usr/include/tcl
@@ -71,7 +71,7 @@ vpath %.h $(VPATH)/../include
 vpath %.c $(VPATH)/../external
 vpath %.c $(VPATH)/../patterns
 
-CFLAGS_PROJECT = -I$(VPATH)/../include
+CFLAGS_PROJECT = -I$(VPATH)/../include -fPIC
 CXXFLAGS_PROJECT = $(CFLAGS_PROJECT)
 LDFLAGS_PROJECT = -L. -l$(LIBNICK)
 LDXXFLAGS_PROJECT = $(LDFLAGS_PROJECT)
@@ -122,8 +122,7 @@ include $(VPATH)/Adds.Makefile
 endif
 
 $(L): $(OBJ_S) $(OBJ_M)
-	ar vr $@ $?
-	ranlib $@
+	$(CC) -shared -o $@ $?
 	
 dispatch:
 	$(CXX) -o $@ $(filter %.o,$^) $(LDXXFLAGS)

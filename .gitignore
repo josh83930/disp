@@ -1,1 +1,3 @@
 lib_linux/*
+*.pyc
+*.swp

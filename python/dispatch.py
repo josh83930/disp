@@ -11,7 +11,8 @@ def iter_pmt_hits(pev):
     a PMTEventRecord structure.
     """
     p = ctypes.byref(pev,ctypes.sizeof(PmtEventRecord))
-    yield from ctypes.cast(p,ctypes.POINTER(FECReadoutData*pev.NPmtHit)).contents
+    for pmt in ctypes.cast(p,ctypes.POINTER(FECReadoutData*pev.NPmtHit)).contents:
+        yield pmt
 
 def get_trigger_type(pev):
     """Returns the trigger type from a PmtEventRecord."""

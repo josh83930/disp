@@ -1,5 +1,27 @@
 import ctypes
 from ctypes import c_uint, c_uint32, c_uint16
+from ctypes._endian import _OTHER_ENDIAN, _array_type, _other_endian, Structure
+
+def _other_endian(typ):
+    """Return the type with the 'other' byte order.  Simple types like
+    c_int and so on already have __ctype_be__ and __ctype_le__
+    attributes which contain the types, for more complicated types
+    arrays and structures are supported.
+    """
+    # check _OTHER_ENDIAN attribute (present if typ is primitive type)
+    if hasattr(typ, _OTHER_ENDIAN):
+        return getattr(typ, _OTHER_ENDIAN)
+    # if typ is array
+    if type(typ) == _array_type:
+        return _other_endian(typ._type_) * typ._length_
+    # if typ is structure
+    if issubclass(typ, Structure):
+        return typ
+    raise TypeError("This type does not support other endian: %s" % typ)
+
+# hack to work on Python2.6
+# see http://bugs.python.org/issue4376
+ctypes._endian._other_endian = _other_endian
 
 TAGSIZE = 8
 BUFFER_SIZE = 130000

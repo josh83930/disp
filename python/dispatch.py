@@ -5,6 +5,15 @@ from record_info import *
 cwd = os.path.dirname(os.path.realpath(__file__))
 libconthost = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(cwd),'lib/libconthost.so'))
 
+def iter_pmt_hits(pev):
+    """
+    Iterate over PMT hits (FECReadoutData structures). The argument `pev` should be
+    a PMTEventRecord structure.
+    """
+    p = ctypes.byref(pev,ctypes.sizeof(PmtEventRecord))
+    for pmt in ctypes.cast(p,ctypes.POINTER(FECReadoutData*pev.NPmtHit)).contents:
+        yield pmt
+
 class Dispatch(object):
     """Receive data from a dispatch stream."""
     def __init__(self, host):
@@ -29,9 +38,9 @@ class Dispatch(object):
         """
         data = ctypes.create_string_buffer(BUFFER_SIZE)
         data_ptr = ctypes.byref(data)
-        len = self._recv(data_ptr, block)
+        nbytes = self._recv(data_ptr, block)
 
-        if len is None:
+        if nbytes is None:
             return None
 
         header = ctypes.cast(data_ptr,ctypes.POINTER(GenericRecordHeader)).contents
@@ -73,5 +82,16 @@ class Dispatch(object):
         libconthost.drop_connection()
 
 if __name__ == '__main__':
+    from itertools import count
+    import time
+
     d = Dispatch('127.0.0.1')
-    d.next()
+    start = time.time()
+    for i in count():
+        try:
+            event_record = d.next()
+        except:
+            pass
+        gtid = event_record.TriggerCardData.BcGT
+        if i % 100 == 0:
+            print("%.2f events/sec" % (i/(time.time() - start)))

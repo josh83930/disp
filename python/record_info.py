@@ -36,31 +36,31 @@ class GenericRecordHeader(ctypes.BigEndianStructure):
 #   FEC data as read out in 96-bit structure 
 class FECReadoutData(ctypes.BigEndianStructure):
     _fields_ = [ #   word 1 (starts from LSB): 
-                ('GTID1',         c_uint,        16), #   lower 16 bits 
-                ('ChannelID',     c_uint,        5),
-                ('CrateID',       c_uint,        5),
-                ('BoardID',       c_uint,        4),
-                ('CGT_ES16',      c_uint,        1),
                 ('CGT_ES24',      c_uint,        1),
+                ('CGT_ES16',      c_uint,        1),
+                ('BoardID',       c_uint,        4),
+                ('CrateID',       c_uint,        5),
+                ('ChannelID',     c_uint,        5),
+                ('GTID1',         c_uint,        16), #   lower 16 bits 
 
                 #   word 2: 
-                ('Qlx',           c_uint,        11),
-                ('SignQlx',       c_uint,        1),
-                ('CellID',        c_uint,        4),
-                ('Qhs',           c_uint,        11),
-                ('SignQhs',       c_uint,        1),
-                ('MissedCount',   c_uint,        1),
-                ('NC_CC',         c_uint,        1),
-                ('LGI_Select',    c_uint,        1),
                 ('Cmos_ES16',     c_uint,        1),
+                ('LGI_Select',    c_uint,        1),
+                ('NC_CC',         c_uint,        1),
+                ('MissedCount',   c_uint,        1),
+                ('SignQhs',       c_uint,        1),
+                ('Qhs',           c_uint,        11),
+                ('CellID',        c_uint,        4),
+                ('SignQlx',       c_uint,        1),
+                ('Qlx',           c_uint,        11),
 
                 #   word 3: 
-                ('Qhl',           c_uint,        11),
-                ('SignQhl',       c_uint,        1),
-                ('GTID2',         c_uint,        4),        #   bits 17-20 
-                ('TAC',           c_uint,        11),
+                ('GTID3',         c_uint,        4),        #   bits 21-24 
                 ('SignTAC',       c_uint,        1),
-                ('GTID3',         c_uint,        4)]        #   bits 21-24 
+                ('TAC',           c_uint,        11),
+                ('GTID2',         c_uint,        4),        #   bits 17-20 
+                ('SignQhl',       c_uint,        1),
+                ('Qhl',           c_uint,        11)]
 
 #   Master Trigger Card data 
 class MTCReadoutData(ctypes.BigEndianStructure):

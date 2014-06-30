@@ -4,7 +4,6 @@ from record_info import *
 import numpy as np
 
 cwd = os.path.dirname(os.path.realpath(__file__))
-libconthost = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(cwd),'lib/libconthost.so'))
 
 def iter_pmt_hits(pev):
     """
@@ -12,8 +11,7 @@ def iter_pmt_hits(pev):
     a PMTEventRecord structure.
     """
     p = ctypes.byref(pev,ctypes.sizeof(PmtEventRecord))
-    for pmt in ctypes.cast(p,ctypes.POINTER(FECReadoutData*pev.NPmtHit)).contents:
-        yield pmt
+    yield from ctypes.cast(p,ctypes.POINTER(FECReadoutData*pev.NPmtHit)).contents
 
 def get_trigger_type(pev):
     """Returns the trigger type from a PmtEventRecord."""
@@ -26,15 +24,16 @@ class Dispatch(object):
     """Receive data from a dispatch stream."""
     def __init__(self, host):
         """Connect to the dispatcher at hostname `host`."""
+        self.libconthost = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(cwd),'lib/libconthost.so'))
         if not isinstance(host,bytes):
             # python 3 strings are not char arrays!
             host = bytes(host,'ascii')
 
-        self.rc = libconthost.init_disp_link(host, b'w RAWDATA w RECHDR')
+        self.rc = self.libconthost.init_disp_link(host, b'w RAWDATA w RECHDR')
 
         if self.rc > 0:
-            libconthost.send_me_always()
-            libconthost.my_id(b"QDISPATCH")
+            self.libconthost.send_me_always()
+            self.libconthost.my_id(b"QDISPATCH")
         else:
             raise Exception("Could not connect to dispatch at %s" % host)
 
@@ -59,6 +58,8 @@ class Dispatch(object):
         if header.RecordID == records['PMT_RECORD']:
             # cast to PmtEventRecord struct
             event_record = ctypes.cast(o,ctypes.POINTER(PmtEventRecord)).contents
+            # attach the data buffer so it doesn't get garbage collected
+            event_record.data = data
             return event_record
         elif header.RecordID in records.values():
             raise NotImplementedError("Unable to decode record type")
@@ -71,15 +72,15 @@ class Dispatch(object):
         ctypes.memset(ctypes.byref(dtag),0,TAGSIZE+1)
 
         if block:
-            rc = libconthost.wait_head(dtag, ctypes.byref(nbytes))
+            rc = self.libconthost.wait_head(dtag, ctypes.byref(nbytes))
         else:
-            rc = libconthost.check_head(dtag, ctypes.byref(nbytes))
+            rc = self.libconthost.check_head(dtag, ctypes.byref(nbytes))
             if not rc:
                 return None
 
         if rc > 0:
             if nbytes.value < BUFFER_SIZE:
-                rc = libconthost.get_data(data, nbytes)
+                rc = self.libconthost.get_data(data, nbytes)
             else:
                 raise Exception("Insufficient buffer size")
 
@@ -87,19 +88,5 @@ class Dispatch(object):
 
 
     def __del__(self):
-        libconthost.drop_connection()
+        self.libconthost.drop_connection()
 
-if __name__ == '__main__':
-    from itertools import count
-    import time
-
-    d = Dispatch('127.0.0.1')
-    start = time.time()
-    for i in count():
-        try:
-            event_record = d.next()
-        except:
-            pass
-        gtid = event_record.TriggerCardData.BcGT
-        if i % 100 == 0:
-            print("%.2f events/sec" % (i/(time.time() - start)))

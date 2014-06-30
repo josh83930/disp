@@ -1,6 +1,5 @@
 import os
 import ctypes
-from ctypes import c_uint, c_uint32, c_uint16
 from record_info import *
 
 cwd = os.path.dirname(os.path.realpath(__file__))
@@ -43,6 +42,7 @@ class Dispatch(object):
         if header.RecordID == records['PMT_RECORD']:
             # cast to PmtEventRecord struct
             event_record = ctypes.cast(o,ctypes.POINTER(PmtEventRecord)).contents
+            return event_record
         elif header.RecordID in records.values():
             raise NotImplementedError("Unable to decode record type")
         else:

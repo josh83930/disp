@@ -2,6 +2,7 @@ import os
 import ctypes
 from record_info import *
 import numpy as np
+import sys
 
 cwd = os.path.dirname(os.path.realpath(__file__))
 
@@ -18,7 +19,9 @@ def get_trigger_type(pev):
     """Returns the trigger type from a PmtEventRecord."""
     mtc_ptr = ctypes.byref(pev.TriggerCardData)
     mtc_words = ctypes.cast(mtc_ptr,ctypes.POINTER(ctypes.c_uint32*6)).contents
-    mtc_words = np.frombuffer(mtc_words, dtype=np.uint32, count=6).byteswap()
+    mtc_words = np.frombuffer(mtc_words, dtype=np.uint32, count=6)
+    if sys.byteorder == 'little':
+        mtc_words = mtc_words.byteswap()
     return ((mtc_words[3] & 0xff000000) >> 24) | ((mtc_words[4] & 0x3ffff) << 8)
 
 class Dispatch(object):

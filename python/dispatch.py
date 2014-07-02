@@ -43,7 +43,6 @@ class Dispatch(object):
         else:
             raise Exception("Could not connect to dispatch at %s" % host)
 
-    @profile
     def next(self, block=True):
         """
         Returns the next event from the dispatch stream. If `block` is True,
@@ -69,11 +68,11 @@ class Dispatch(object):
             event_record.data = data
             return event_record
         elif header.RecordID in records.values():
-            raise NotImplementedError("Unable to decode record type")
+            raise NotImplementedError("Unable to decode record type '{name}'".format(
+                name=records.keys()[records.values().index(header.RecordID)]))
         else:
             raise TypeError("Unknown record type")
 
-    @profile
     def _recv(self, data, block=True):
         nbytes = ctypes.c_int()
         dtag = ctypes.create_string_buffer(TAGSIZE+1)

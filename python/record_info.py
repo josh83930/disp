@@ -23,10 +23,7 @@ def _other_endian(typ):
 # see http://bugs.python.org/issue4376
 ctypes._endian._other_endian = _other_endian
 
-TAGSIZE = 8
-BUFFER_SIZE = 130000
-
-records = \
+RECORD_IDS = \
 {
 'MAST_RECORD':    0x4d415354,  # 'MAST'
 'RHDR_RECORD':    0x52484452,  # 'RHDR'  (as written to ZDAB file)

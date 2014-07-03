@@ -8,16 +8,32 @@ import sys
 _cwd = os.path.dirname(os.path.realpath(__file__))
 _libconthost_path = os.path.join(os.path.dirname(_cwd),'lib/libconthost.so')
 
-def iter_pmt_hits(pev):
+def unpack_header(data):
     """
-    Iterate over PMT hits (FECReadoutData structures). The argument `pev` should be
-    a PMTEventRecord structure.
+    Unpacks the record header from `data` and returns the record type
+    and the record data as a tuple.
     """
-    p = byref(pev,sizeof(PmtEventRecord))
-    for pmt in cast(p,POINTER(FECReadoutData*pev.NPmtHit)).contents:
-        yield pmt
+    header = GenericRecordHeader.from_buffer_copy(data)
 
-def get_trigger_type(pev):
+    if header.RecordID not in records.values():
+        raise TypeError('Unknown record id {id}'.format(header.RecordID))
+
+    return header.RecordID, data[sizeof(GenericRecordHeader):]
+
+def unpack_pmt_record(data):
+    """
+    Unpacks a PMT event record. This method returns a generator which first
+    yields the PmtEventRecord struct and then the individual PMT records
+    (FECReadoutData structs).
+    """
+    event_record = PmtEventRecord.from_buffer_copy(data)
+
+    yield event_record
+
+    for i in range(0,event_record.NPmtHit,sizeof(FECReadoutData)):
+        yield FECReadoutData.from_buffer_copy(data,sizeof(PmtEventRecord)+i)
+
+def unpack_trigger_type(pev):
     """Returns the trigger type from a PmtEventRecord."""
     mtc_ptr = byref(pev.TriggerCardData)
     mtc_words = cast(mtc_ptr,POINTER(ctypes.c_uint32*6)).contents
@@ -49,21 +65,17 @@ class Dispatch(object):
         block until an event is received. If `block` is False, and no event
         is available, returns None.
         """
-        data = ctypes.create_string_buffer(BUFFER_SIZE)
-        data_ptr = byref(data)
-        nbytes = self._recv(data_ptr, block)
+        data = self.recv(block)
 
-        if nbytes is None:
+        if data is None:
+            # no data ready
             return None
 
-        header = cast(data_ptr,POINTER(GenericRecordHeader)).contents
-
-        # pointer just past the header
-        o = byref(data,sizeof(GenericRecordHeader))
+        header = GenericRecordHeader.from_buffer(data)
 
         if header.RecordID == records['PMT_RECORD']:
             # cast to PmtEventRecord struct
-            event_record = cast(o,POINTER(PmtEventRecord)).contents
+            event_record = PmtEventRecord.from_buffer(data,sizeof(GenericRecordHeader))
             # attach the data buffer so it doesn't get garbage collected
             event_record.data = data
             return event_record
@@ -73,7 +85,8 @@ class Dispatch(object):
         else:
             raise TypeError("Unknown record type")
 
-    def _recv(self, data, block=True):
+    def recv(self, block=True):
+        """Returns the next record from the dispatcher as a string buffer"""
         nbytes = ctypes.c_int()
         dtag = ctypes.create_string_buffer(TAGSIZE+1)
         ctypes.memset(byref(dtag),0,TAGSIZE+1)
@@ -85,13 +98,19 @@ class Dispatch(object):
             if not rc:
                 return None
 
+        data = ctypes.create_string_buffer(nbytes.value)
+
         if rc > 0:
             if nbytes.value < BUFFER_SIZE:
                 rc = self.libconthost.get_data(data, nbytes)
             else:
                 raise Exception("Insufficient buffer size")
 
-        return nbytes.value
+        return data
+
+    def __iter__(self):
+        while True:
+            yield self.recv()
 
     def __del__(self):
         self.libconthost.drop_connection()

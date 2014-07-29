@@ -72,7 +72,7 @@ class Dispatch(object):
         if rc > 0:
             rc = self.libconthost.get_data(data, nbytes)
         else:
-            raise RunTimeError('check_head() or wait_head() returned {rc}'.format(rc))
+            raise RunTimeError('check_head() or wait_head() returned {}'.format(rc))
 
         return data
 

@@ -9,31 +9,24 @@ To install the dispatcher library::
     $ git clone git@github.com:snoplus/disp.git
     $ cd disp
     $ make
+    $ source env.sh
 
 Running the Dispatcher
 ----------------------
 
 To run the dispatcher, simply run::
 
-    $ disp/bin/dispatch
+    $ dispatch
 
 To run the dispatcher as a daemon::
 
-    $ nohup disp/bin/dispatch &>[path/to/logfile] &
+    $ nohup dispatch &>[path/to/logfile] &
 
 Reading from the Dispatcher
 ---------------------------
 
 You can read events from the dispatch stream
-using the python module dispatch. First, add
-the python directory to your PYTHONPATH environment
-variable and the lib directory to your
-LD_LIBRARY_PATH environment variable::
-
-    $ export PYTHONPATH=[/path/to/disp]/python:$PYTHONPATH
-    $ export LD_LIBRARY_PATH=[/path/to/disp]/lib:$LD_LIBRARY_PATH
-
-and then `import dispatch`. For example::
+using the python module dispatch::
 
     >>> from dispatch import *
     >>> d = Dispatch('localhost')

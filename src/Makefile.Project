@@ -34,6 +34,9 @@
 # Makefile to create socket communication support library
 # and main dispatcher program
 
+BINDIR = $(VPATH)/../bin
+LIBDIR = $(VPATH)/../lib
+
 ifeq ($(SYS),HP_UX)
  USE_LOCAL_COMPILER = no
 endif
@@ -73,11 +76,12 @@ vpath %.c $(VPATH)/../patterns
 
 CFLAGS_PROJECT = -I$(VPATH)/../include -fPIC
 CXXFLAGS_PROJECT = $(CFLAGS_PROJECT)
-LDFLAGS_PROJECT = -L. -l$(LIBNICK)
+LDFLAGS_PROJECT = -L$(LIBDIR) -l$(LIBNICK)
 LDXXFLAGS_PROJECT = $(LDFLAGS_PROJECT)
 
 % : %.o
-	$(CC) -o $@ $(filter %.o,$^) $(LDFLAGS)
+	@mkdir -p $(BINDIR)
+	$(CC) -o $(BINDIR)/$@ $(filter %.o,$^) $(LDFLAGS)
 #	strip $@
 
 # low level socket support routines, signal processing, 
@@ -122,7 +126,8 @@ include $(VPATH)/Adds.Makefile
 endif
 
 $(L): $(OBJ_S) $(OBJ_M)
-	$(CC) -shared -o $@ $?
+	@mkdir -p $(LIBDIR)
+	$(CC) -shared -o $(LIBDIR)/$@ $?
 	
 dispatch:
 	$(CXX) -o $@ $(filter %.o,$^) $(LDXXFLAGS)

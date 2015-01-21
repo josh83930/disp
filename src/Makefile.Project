@@ -130,7 +130,7 @@ $(L): $(OBJ_S) $(OBJ_M)
 	$(CC) -shared -o $(LIBDIR)/$@ $?
 	
 dispatch:
-	$(CXX) -o $@ $(filter %.o,$^) $(LDXXFLAGS)
+	$(CXX) -o $(BINDIR)/$@ $(filter %.o,$^) $(LDXXFLAGS)
 #	strip $@
 
 #tcldisp: tcldisp.o pat_tcl_user.o $(L)

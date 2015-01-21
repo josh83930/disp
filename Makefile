@@ -6,6 +6,8 @@ default: all
 	cd src && $(MAKE) $@
 
 install:
-	cd src && $(MAKE) $@
+	@mkdir -p $(DESTDIR)/bin $(DESTDIR)/lib
+	install -m 0755 bin/* $(DESTDIR)/bin
+	install -m 0755 lib/* $(DESTDIR)/lib
 
 .PHONY: install

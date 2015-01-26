@@ -130,6 +130,7 @@ $(L): $(OBJ_S) $(OBJ_M)
 	$(CC) -shared -o $(LIBDIR)/$@ $?
 	
 dispatch:
+	@mkdir -p $(BINDIR)
 	$(CXX) -o $(BINDIR)/$@ $(filter %.o,$^) $(LDXXFLAGS)
 #	strip $@
 

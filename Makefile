@@ -9,5 +9,6 @@ install:
 	@mkdir -p $(DESTDIR)/bin $(DESTDIR)/lib
 	install -m 0755 bin/* $(DESTDIR)/bin
 	install -m 0755 lib/* $(DESTDIR)/lib
+	cd python && $(MAKE) $@ PREFIX=$(DESTDIR)
 
 .PHONY: install

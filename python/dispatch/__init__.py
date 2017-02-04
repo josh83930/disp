@@ -20,12 +20,15 @@ def unpack_pmt_record(data):
     yields the PmtEventRecord struct and then the individual PMT records
     (FECReadoutData structs).
     """
-    event_record = PmtEventRecord.from_buffer_copy(data)
+    fec_data_size = ctypes.sizeof(FECReadoutData)
+    pmt_event_size = ctypes.sizeof(PmtEventRecord)
 
+    event_record = PmtEventRecord.from_buffer_copy(data)
     yield event_record
 
-    for i in range(0,event_record.NPmtHit,ctypes.sizeof(FECReadoutData)):
-        yield FECReadoutData.from_buffer_copy(data,ctypes.sizeof(PmtEventRecord)+i)
+    for i in range(0, event_record.NPmtHit):
+        offset = pmt_event_size + i*fec_data_size
+        yield FECReadoutData.from_buffer_copy(data, offset)
 
 def unpack_trigger_type(pev):
     """Returns the trigger type from a PmtEventRecord."""

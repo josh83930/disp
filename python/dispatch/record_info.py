@@ -65,6 +65,42 @@ class RunHeaderRecord(ctypes.BigEndianStructure):
                 ('ValidGTID',               ctypes.c_uint32),
                 ('Spares',                  ctypes.c_uint32*8)]
 
+class TriggerRecord(ctypes.BigEndianStructure):
+    _fields_ = [('TriggerMask',     ctypes.c_uint32),
+                ('n100lo',          ctypes.c_uint32),
+                ('n100med',         ctypes.c_uint32),
+                ('n100hi',          ctypes.c_uint32),
+                ('n20',             ctypes.c_uint32),
+                ('n20lb',           ctypes.c_uint32),
+                ('esumlo',          ctypes.c_uint32),
+                ('esumhi',          ctypes.c_uint32),
+                ('owln',            ctypes.c_uint32),
+                ('owlelo',          ctypes.c_uint32),
+                ('owlehi',          ctypes.c_uint32),
+                ('n100_mask',       ctypes.c_uint32),
+                ('n20_mask',        ctypes.c_uint32),
+                ('esumlo_mask',     ctypes.c_uint32),
+                ('esumhi_mask',     ctypes.c_uint32),
+                ('owlelo_mask',     ctypes.c_uint32),
+                ('owlehi_mask',     ctypes.c_uint32),
+                ('owln_mask',       ctypes.c_uint32),
+                ('Spares',          ctypes.c_uint32*3),
+                ('PulserRate',      ctypes.c_uint32),
+                ('ControlRegister', ctypes.c_uint32),
+                ('LockoutWidth',    ctypes.c_uint32),
+                ('Prescale',        ctypes.c_uint32),
+                ('GTID',            ctypes.c_uint32)]
+
+class EPEDRecord(ctypes.BigEndianStructure):
+    _fields_ = [('pedestal_width',        ctypes.c_uint32),
+                ('pedestal_delay_coarse', ctypes.c_uint32),
+                ('pedestal_delay_fine',   ctypes.c_uint32),
+                ('qinj_dacsetting',       ctypes.c_uint32),
+                ('half_crate_id',         ctypes.c_uint32),
+                ('calibration_type',      ctypes.c_uint32),
+                ('gtid',                  ctypes.c_uint32),
+                ('flags',                 ctypes.c_uint32)]
+
 #   FEC data as read out in 96-bit structure 
 class FECReadoutData(ctypes.BigEndianStructure):
     _fields_ = [ #   word 1 (starts from LSB): 

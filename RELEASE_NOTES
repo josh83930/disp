@@ -1,0 +1,17 @@
+Release Notes
+=============
+
+v1.2
+----
+
+    - add run header, trigger, and EPED records to record_info.py
+
+v1.1
+----
+
+    - fixed bug with looping over hits in a pmt record
+
+v1.0
+----
+
+    - initial release

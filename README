@@ -44,3 +44,20 @@ using the python module dispatch::
     11
     3
 
+Tagging a Release
+=================
+
+First, make sure to set the version number in the Makefile and in
+python/setup.py!
+
+Then, make sure to edit the RELEASE_NOTES and make a note of any changes from
+the previous release.
+
+Finally, commit the changes and then tag the release:
+
+    $ git commit
+    $ git tag -a v1.2
+
+You can push the tags to the remote server with the command:
+
+    $ git push origin --tags

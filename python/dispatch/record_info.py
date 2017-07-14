@@ -52,6 +52,19 @@ class GenericRecordHeader(ctypes.BigEndianStructure):
                 ('RecordLength',  ctypes.c_uint32),
                 ('RecordVersion', ctypes.c_uint32)]
 
+class RunHeaderRecord(ctypes.BigEndianStructure):
+    _fields_ = [('Date',                    ctypes.c_uint32),
+                ('Time',                    ctypes.c_uint32),
+                ('SubFile',                 ctypes.c_uint32),
+                ('RunNumber',               ctypes.c_uint32),
+                ('CalibrationTrialNumber',  ctypes.c_uint32),
+                ('SourceMask',              ctypes.c_uint32),
+                ('RunMask',                 ctypes.c_uint32),
+                ('GTCrateMask',             ctypes.c_uint32),
+                ('FirstGTID',               ctypes.c_uint32),
+                ('ValidGTID',               ctypes.c_uint32),
+                ('Spares',                  ctypes.c_uint32*8)]
+
 #   FEC data as read out in 96-bit structure 
 class FECReadoutData(ctypes.BigEndianStructure):
     _fields_ = [ #   word 1 (starts from LSB): 

@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+v1.2.1
+------
+
+    - fix typo RunTimeError -> RuntimeError
+
 v1.2
 ----
 

@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+v1.2.2
+------
+
+    - update unpack_trigger_type to make sure the missed trigger bit is included
+
 v1.2.1
 ------
 

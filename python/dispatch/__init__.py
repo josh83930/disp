@@ -34,7 +34,7 @@ def unpack_trigger_type(pev):
     """Returns the trigger type from a PmtEventRecord."""
     mtc_words = struct.unpack('>IIIIII', pev.TriggerCardData)
 
-    return ((mtc_words[3] & 0xff000000) >> 24) | ((mtc_words[4] & 0x3ffff) << 8)
+    return ((mtc_words[3] & 0xff000000) >> 24) | ((mtc_words[4] & 0x7ffff) << 8)
 
 class Dispatch(object):
     """Receive data from a dispatch stream."""

@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='dispatch',
-      version='1.2.1',
+      version='1.2.2',
       description='Python bindings for receiving data from the SNO+ dispatcher',
       author="Anthony LaTorre",
       author_email="tlatorre@uchicago.edu",

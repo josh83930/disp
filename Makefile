@@ -5,7 +5,7 @@ default: all
 .DEFAULT:
 	cd src && $(MAKE) $@
 
-VERSION=1.2.2
+VERSION=1.2.3
 
 archive:
 	git archive --format=tar --prefix=disp-$(VERSION)/ v$(VERSION) | gzip > disp-$(VERSION).tar.gz

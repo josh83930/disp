@@ -22,6 +22,26 @@ To run the dispatcher as a daemon::
 
     $ nohup dispatch &>[path/to/logfile] &
 
+If you get this error:
+
+Troubleshooting
+---------------
+
+"Cannot create shared memory segment: No such file or directory"
+
+    Specify the dispatcher directory when running. ie)
+
+    $ ./dispatch
+
+"Cannot create shared memory segment: Invalid argument"
+
+    Make sure you are running version 1.2.4 or later
+
+"Cannot create shared memory segment: Cannot allocate memory"
+
+    1. Run "ipcs -a" to list all used shared memory segments
+    2. Run "ipcrm -m ID" to free to some shared memory
+
 Reading from the Dispatcher
 ---------------------------
 

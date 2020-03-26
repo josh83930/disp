@@ -44,7 +44,7 @@ extern int   optind;
 
 // default size of shared memory (Kbytes)
 static const int default_sh_mem_data_size = 
-#ifdef OSF1
+#if defined(OSF1) || defined(Darwin)
   3*1024;
 #else
   8*1024;

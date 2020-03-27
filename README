@@ -40,7 +40,7 @@ Troubleshooting
 "Cannot create shared memory segment: Cannot allocate memory"
 
     1. Run "ipcs -a" to list all used shared memory segments
-    2. Run "ipcrm -m ID" to free to some shared memory
+    2. Run "ipcrm -m <id>" to free to shared memory segment with ID <id>
 
 Reading from the Dispatcher
 ---------------------------
